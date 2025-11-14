@@ -1,12 +1,6 @@
-import {
-  type CallHandler,
-  type ExecutionContext,
-  Injectable,
-  Logger,
-  type NestInterceptor,
-} from "@nestjs/common";
-import type { Observable } from "rxjs";
-import { map } from "rxjs/operators";
+import { type CallHandler, type ExecutionContext, Injectable, Logger, type NestInterceptor } from '@nestjs/common';
+import type { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {
@@ -17,10 +11,10 @@ export class ResponseInterceptor implements NestInterceptor {
     const req = context.switchToHttp().getRequest();
     const res = context.switchToHttp().getResponse();
     const statusMessage: { [key: number]: string } = {
-      200: "Ok",
-      201: "Created",
-      202: "Accepted",
-      204: "No Content",
+      200: 'Ok',
+      201: 'Created',
+      202: 'Accepted',
+      204: 'No Content',
     };
 
     const { url, method } = req;
@@ -30,20 +24,16 @@ export class ResponseInterceptor implements NestInterceptor {
         const code = res.statusCode;
         const response = {
           code,
-          data,
           message: statusMessage[code],
+          data,
         };
 
-        if (url !== "/api/health-check") {
-          const loggingData = `[${method} <${code}> "${
-            statusMessage[code]
-          }"] ${url} - ${Date.now() - requestedAt}ms`;
+        const loggingData = `[${method} <${code}> "${statusMessage[code]}"] ${url} - ${Date.now() - requestedAt}ms`;
 
-          this.logger.log(loggingData);
-        }
+        this.logger.log(loggingData);
 
         return response;
-      })
+      }),
     );
   }
 }
