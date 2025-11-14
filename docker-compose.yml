@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  nginx:
+    build: ./servers/nginx
+    container_name: nginx
+    depends_on:
+      - user-server
+      - admin-server
+      - product-server
+      - notification-server
+    ports:
+      - '80:80'
+      - '443:443'
+    networks:
+      - kream-network
+    environment:
+      - NGINX_PORT=80
+
+  user-server:
+    build: ./servers/user_server
+    container_name: user-server
+    depends_on:
+      - serviceName
+    networks:
+      - kream-network
+    environment:
+      - SERVER_PORT=6000
+
+  admin-server:
+    build: ./servers/admin_server
+    container_name: admin-server
+    networks:
+      - kream-network
+    environment:
+      - SERVER_PORT=6010
+
+  product-server:
+    build: ./servers/product_server
+    container_name: product-server
+    networks:
+      - kream-network
+    environment:
+      - SERVER_PORT=6020
+
+  notification-server:
+    build: ./servers/notification_server
+    container_name: notification-server
+    networks:
+      - kream-network
+    environment:
+      - SERVER_PORT=6030
+
+  database:
+    image: postgres:15-alpine
+    container_name: database
+    networks:
+      - kream-network
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=kream-imitation
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  cache:
+    image: valkey:9-alpine
+    container_name: cache
+    networks:
+      - kream-network
+    ports:
+      - '6379:6379'
+
+networks:
+  kream-network:
+    driver: bridge

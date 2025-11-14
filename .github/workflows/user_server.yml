@@ -1,0 +1,49 @@
+name: Deploy User Server
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "servers/user_server/**"
+      - ".github/workflows/user_server.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy-user-server:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests - User Server
+        working-directory: servers/user_server
+        run: |
+          npm run lint
+          npm run test
+
+      - name: Build Docker image - User Server
+        run: docker compose -f infrastructure/docker-compose.yml build user-server
+
+      - name: Restart User Server
+        run: |
+          docker compose -f infrastructure/docker-compose.yml up -d user-server
+
+      - name: Wait for service
+        run: sleep 10
+
+      - name: Health check
+        run: curl -f http://localhost:6000/health || exit 1
+
+      - name: Show logs
+        if: failure()
+        run: docker compose -f infrastructure/docker-compose.yml logs user-server --tail=50
