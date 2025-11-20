@@ -1,15 +1,101 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "../src/prisma-build"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+}
+
+model managers {
+  id            Int             @id @default(autoincrement())
+  permissionId  Int
+  email         String          @unique @db.VarChar
+  name          String          @db.VarChar
+  password      String          @db.VarChar
+  department    String          @db.VarChar
+  createdAt     DateTime        @default(now()) @db.Timestamp(6)
+  updatedAt     DateTime?       @db.Timestamp(6)
+  deletedAt     DateTime?       @db.Timestamp(6)
+  blackList     black_list[]
+  permission    permissions     @relation(fields: [permissionId], references: [id])
+}
+
+model permissions {
+  id               Int        @id @default(autoincrement())
+  name             String     @db.VarChar
+  canHandleBoard   Boolean    @default(false)
+  canHandleProduct Boolean    @default(false)
+  canHandleUser    Boolean    @default(false)
+  createdAt        DateTime   @default(now()) @db.Timestamp(6)
+  updatedAt        DateTime?  @db.Timestamp(6)
+  managers         managers[]
+}
+
+model black_list {
+  id        Int       @id @default(autoincrement())
+  managerId Int
+  userId    Int
+  reason    String
+  createdAt DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt DateTime? @db.Timestamp(6)
+  managers  managers  @relation(fields: [managerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model announcements {
+  id        Int                @id @default(autoincrement())
+  title     String             @db.VarChar
+  content   String
+  type      announcements_type
+  isVisible Boolean            @default(true)
+  createdAt DateTime           @default(now()) @db.Timestamp(6)
+  updatedAt DateTime?          @db.Timestamp(6)
+  deletedAt DateTime?          @db.Timestamp(6)
+}
+
+model frequently_asked_questions {
+  id        Int                             @id @default(autoincrement())
+  title     String                          @db.VarChar
+  content   String
+  type      frequently_asked_questions_type
+  isVisible Boolean                         @default(true)
+  createdAt DateTime                        @default(now()) @db.Timestamp(6)
+  updatedAt DateTime?                       @db.Timestamp(6)
+  deletedAt DateTime?                       @db.Timestamp(6)
+}
+
+model quality_standards {
+  id        Int                    @id @default(autoincrement())
+  managerId Int
+  title     String                 @db.VarChar
+  content   String
+  type      quality_standards_type
+  isVisible Boolean                @default(true)
+  createdAt DateTime               @default(now()) @db.Timestamp(6)
+  updatedAt DateTime?              @db.Timestamp(6)
+  deletedAt DateTime?              @db.Timestamp(6)
+}
+
+enum announcements_type {
+  ANNOUNCEMENT
+  EVENT
+  SERVICE_GUIDE
+  ETC
+}
+
+enum frequently_asked_questions_type {
+  USAGE_POLICY
+  COMMON
+  PURCHASE
+  SALE
+}
+
+enum quality_standards_type {
+  SHOES
+  CLOTHES
+  FASHION_ACCESSORIES
+  TECH
+  COLLECTABLE
+  PREMIUM_BAG
+  PREMIUM_WATCH
 }

@@ -1,7 +1,7 @@
 import type { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import type { AxiosResponse } from 'axios';
-import { ServerOutPort, type ServerResponse } from '../../../port/out-port/server/interface/common';
+import { ServerOutPort, type ServerResponse } from '../../../port/out-port/server/interface/common.js';
 
 @Injectable()
 export class ProductServer extends ServerOutPort {

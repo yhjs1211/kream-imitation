@@ -1,15 +1,105 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "../src/prisma-build"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+}
+
+model asks {
+  id                 Int       @id @default(autoincrement())
+  productId          Int
+  sizeId             Int
+  userId             Int
+  price              Int
+  finishInspection   Boolean   @default(false)
+  needStoreWarehouse Boolean
+  createdAt          DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt          DateTime? @db.Timestamp(6)
+  products           products  @relation(fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  sizes              sizes     @relation(fields: [sizeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model bids {
+  id                               Int       @id @default(autoincrement())
+  productId                        Int
+  sizeId                           Int
+  userId                           Int
+  price                            Int
+  agreeCanNotRefundForChangeOfMind Boolean   @default(true)
+  agreeBeCancelled                 Boolean   @default(true)
+  readLatestPolicy                 Boolean   @default(true)
+  needStoreWarehouse               Boolean
+  createdAt                        DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt                        DateTime? @db.Timestamp(6)
+  products                         products  @relation(fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  sizes                            sizes     @relation(fields: [sizeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model brands {
+  id       Int        @id @default(autoincrement())
+  name     String     @unique @db.VarChar
+  category category[]
+  products products[]
+}
+
+model category {
+  id        Int          @id @default(autoincrement())
+  brandName String       @db.VarChar
+  name      String       @db.VarChar
+  type      CategoryType
+  brands    brands       @relation(fields: [brandName], references: [name], onDelete: NoAction, onUpdate: NoAction)
+  products  products[]
+  sizes     sizes[]
+}
+
+model products {
+  id          Int       @id @default(autoincrement())
+  brandName   String    @db.VarChar
+  categoryId  Int
+  name        String    @db.VarChar
+  modelName   String    @db.VarChar
+  description String    @db.VarChar
+  price       Int
+  releasedAt  DateTime? @db.Timestamp(6)
+  asks        asks[]
+  bids        bids[]
+  brands      brands    @relation(fields: [brandName], references: [name], onDelete: NoAction, onUpdate: NoAction)
+  category    category  @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  reviews     reviews[]
+}
+
+model reviews {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  userId    Int
+  imageURL  String?  @db.VarChar
+  content   String
+  products  products @relation(fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model sizes {
+  id         Int      @id @default(autoincrement())
+  categoryId Int
+  size       String   @db.VarChar
+  asks       asks[]
+  bids       bids[]
+  category   category @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+enum CategoryType {
+  OUTER
+  TOP
+  BOTTOM
+  SHOES
+  BAG
+  WALLET
+  WATCH
+  TECH
+  BEAUTY
+  COLLECTABLE
+  FASHION_ACCESSORY
+  CAMPING
+  FURNITURE
 }

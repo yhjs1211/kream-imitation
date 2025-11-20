@@ -1,15 +1,160 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "../src/prisma-build"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+}
+
+model accounts {
+  id            Int      @id @default(autoincrement())
+  userId        Int      @unique
+  bankName      String   @db.VarChar
+  accountNumber String   @db.VarChar
+  ownerName     String   @db.VarChar
+  createdAt     DateTime @default(now()) @db.Timestamp(6)
+  users         users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model addresses {
+  id            Int     @id @default(autoincrement())
+  userId        Int
+  isMain        Boolean @default(false)
+  postNumber    String  @db.VarChar
+  address       String  @db.VarChar
+  addressDetail String  @db.VarChar
+  users         users   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model coupons {
+  id                    Int            @id @default(autoincrement())
+  code                  String?        @unique @db.VarChar
+  name                  String         @db.VarChar
+  discountRate          Int
+  minimumOrderAmount    Int?
+  maximumDiscountAmount Int?
+  hasExcludedItem       Boolean        @default(true)
+  isForBrandDelivery    Boolean        @default(true)
+  isExposed             Boolean        @default(true)
+  createdAt             DateTime       @default(now()) @db.Timestamp(6)
+  updatedAt             DateTime?      @db.Timestamp(6)
+  expirationDate        DateTime       @db.Timestamp(6)
+  user_coupons          user_coupons[]
+}
+
+model interest_brand {
+  id      Int   @id @default(autoincrement())
+  userId  Int
+  brandId Int
+  users   users @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model interest_products {
+  id        Int   @id @default(autoincrement())
+  userId    Int
+  productId Int
+  users     users @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model payment_cards {
+  id             Int         @id @default(autoincrement())
+  userId         Int
+  isMain         Boolean     @default(false)
+  cardCompany    CardCompany
+  number         String      @db.VarChar
+  expirationDate DateTime    @db.Date
+  password       String      @db.VarChar
+  ownerBirthDate DateTime    @db.Date
+  createdAt      DateTime    @default(now()) @db.Timestamp(6)
+  users          users       @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model profiles {
+  id                   Int       @id @default(autoincrement())
+  userId               Int       @unique
+  profileName          String    @db.VarChar
+  mobile               String?   @db.VarChar
+  profileImageUrl      String?   @db.VarChar
+  introduction         String?
+  height               Int?
+  weight               Int?
+  shoeSize             Int?
+  outerSize            Int?
+  topSize              Int?
+  bottomSize           Int?
+  agreeUsePersonalInfo Boolean   @default(false)
+  agreeGetNotiAsSms    Boolean   @default(false)
+  agreeGetNotiAsEmail  Boolean   @default(false)
+  createdAt            DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt            DateTime? @db.Timestamp(6)
+  users                users     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model region {
+  id    Int     @id @default(autoincrement())
+  state State
+  siGun String? @db.VarChar
+  gu    String? @db.VarChar
+}
+
+model user_coupons {
+  userId    Int
+  couponId  Int
+  createdAt DateTime  @default(now()) @db.Timestamp(6)
+  usedAt    DateTime? @db.Timestamp(6)
+  coupons   coupons   @relation(fields: [couponId], references: [id])
+  users     users     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, couponId])
+}
+
+model users {
+  id                Int                 @id @default(autoincrement())
+  name              String              @db.VarChar
+  email             String              @db.VarChar
+  password          String              @db.VarChar
+  isInactive        Boolean             @default(false)
+  isInBlackList     Boolean             @default(false)
+  createdAt         DateTime            @default(now()) @db.Timestamp(6)
+  updatedAt         DateTime?           @db.Timestamp(6)
+  withdrewAt        DateTime?           @db.Timestamp(6)
+  accounts          accounts?
+  addresses         addresses[]
+  interest_brand    interest_brand[]
+  interest_products interest_products[]
+  payment_cards     payment_cards[]
+  profiles          profiles?
+  user_coupons      user_coupons[]
+}
+
+enum CardCompany {
+  SHINHAN
+  SAMSUNG
+  KB
+  HYUNDAI
+  LOTTE
+  WOORIE
+  HANA
+  BC
+  NH
+}
+
+enum State {
+  GYEONGGI @map("경기도")
+  GANGWON @map("강원도")
+  CHUNGCHEONGNAM @map("충청남도")
+  CHUNGCHEONGBUK @map("충청북도")
+  JEOLLANAM @map("전라남도")
+  JEOLLABUK @map("전라북도")
+  GYEONGSANGNAM @map("경상남도")
+  GYEONGSANGBOK @map("경상북도")
+  JEJU @map("제주도")
+  SEOUL @map("서울")
+  BUSAN @map("부산")
+  INCHEON @map("인천")
+  DAEGU @map("대구")
+  GWANGJU @map("광주")
+  DAEJEON @map("대전")
+  ULSAN @map("울산")
 }

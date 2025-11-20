@@ -1,12 +1,15 @@
 import { Injectable, Logger, type OnModuleInit } from '@nestjs/common';
-import { PrismaClient } from '../../../generated/prisma';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient } from '../../prisma-build/client.js';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
   private readonly logger = new Logger(PrismaService.name);
 
-  constructor() {
+  constructor(configService: ConfigService) {
     super({
+      adapter: new PrismaPg({ connectionString: configService.get('DATABASE_URL')! }),
       log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
     });
   }

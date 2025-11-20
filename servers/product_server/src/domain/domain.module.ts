@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { Mapper, SYMBOL_MAPPER } from './Mapper';
+import { Mapper, SYMBOL_MAPPER } from './Mapper.js';
 
 @Module({
   exports: [SYMBOL_MAPPER],

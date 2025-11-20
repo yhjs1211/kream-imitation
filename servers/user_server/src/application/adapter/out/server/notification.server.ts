@@ -1,7 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { AxiosResponse } from 'axios';
-import { ServerOutPort, ServerResponse } from '../../../port/out-port/server/interface/common';
+import { ServerOutPort, ServerResponse } from '../../../port/out-port/server/interface/common.js';
 
 @Injectable()
 export class NotificationServer extends ServerOutPort {

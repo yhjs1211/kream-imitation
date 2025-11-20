@@ -1,15 +1,48 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "../src/prisma-build"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+}
+
+model failed_notifications {
+  id               Int        @id @default(autoincrement())
+  referenceSubject String     @db.VarChar
+  userId           Int
+  reason           String     @db.VarChar
+  createdAt        DateTime   @default(now()) @db.Timestamp(6)
+  references       references @relation(fields: [referenceSubject], references: [subject], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model notifications {
+  id        Int              @id @default(autoincrement())
+  userId    Int
+  type      NotificationType
+  title     String           @db.VarChar
+  content   String
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now()) @db.Timestamp(6)
+  updatedAt DateTime?        @db.Timestamp(6)
+}
+
+model references {
+  id                   Int                    @id @default(autoincrement())
+  subject              String                 @unique @db.VarChar
+  title                String                 @db.VarChar
+  content              String
+  type                 NotificationType
+  createdAt            DateTime               @default(now()) @db.Timestamp(6)
+  updatedAt            DateTime?              @db.Timestamp(6)
+  failed_notifications failed_notifications[]
+}
+
+enum NotificationType {
+  TRADE
+  BID
+  STORE_SALE
+  INTEREST
+  BENEFIT
+  ETC
 }

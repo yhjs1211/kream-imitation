@@ -2,12 +2,12 @@ import { ConsoleLogger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { AppModule } from './app.module';
-import { BadRequestExceptionFilter } from './common/Exceptions/BadRequest.exception.filter';
-import { ForbiddenExceptionFilter } from './common/Exceptions/Forbidden.exception.filter';
-import { NotFoundExceptionFilter } from './common/Exceptions/NotFound.exception.filter';
-import { UnauthorizedExceptionFilter } from './common/Exceptions/Unauthorized.exception.filter';
-import { UnexpectedExceptionsFilter } from './common/Exceptions/Unexpected.exception.filter';
+import { AppModule } from './app.module.js';
+import { BadRequestExceptionFilter } from './common/Exceptions/BadRequest.exception.filter.js';
+import { ForbiddenExceptionFilter } from './common/Exceptions/Forbidden.exception.filter.js';
+import { NotFoundExceptionFilter } from './common/Exceptions/NotFound.exception.filter.js';
+import { UnauthorizedExceptionFilter } from './common/Exceptions/Unauthorized.exception.filter.js';
+import { UnexpectedExceptionsFilter } from './common/Exceptions/Unexpected.exception.filter.js';
 
 async function bootstrap() {
   const logLevels: ('error' | 'warn' | 'log' | 'verbose' | 'debug' | 'fatal')[] =

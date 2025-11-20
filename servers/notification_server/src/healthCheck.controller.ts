@@ -1,5 +1,5 @@
 import { Controller, Get, UseInterceptors } from '@nestjs/common';
-import { ResponseInterceptor } from './common/Interceptors/Response.interceptor';
+import { ResponseInterceptor } from './common/Interceptors/Response.interceptor.js';
 
 @UseInterceptors(ResponseInterceptor)
 @Controller('health-check')

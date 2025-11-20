@@ -3,8 +3,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { JwtStrategy, SYMBOL_JWT_STRATEGY } from '../common/Guard/strategy/jwt.strategy';
-import { InfrastructureModule } from '../infrastructure/infrastructure.module';
+import { JwtStrategy, SYMBOL_JWT_STRATEGY } from '../common/Guard/strategy/jwt.strategy.js';
+import { InfrastructureModule } from '../infrastructure/infrastructure.module.js';
 
 @Module({
   controllers: [],
@@ -17,7 +17,7 @@ import { InfrastructureModule } from '../infrastructure/infrastructure.module';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get('JWT_ID_SECRET'),
+        secret: configService.get('JWT_ACCESS_SECRET'),
       }),
     }),
   ],
